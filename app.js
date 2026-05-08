@@ -13,6 +13,8 @@ app.use(express.urlencoded({ extended: true }));
 //Rotas
 app.use('/auth',     require('./routes/authRoutes'));
 app.use('/receitas', require('./routes/receitaRoutes'));
+app.use('/categorias', require('./routes/categoriaRoutes'));
+app.use('/habilidades', require('./routes/habilidadeRoutes'));
 app.get('/', (req, res) => {
   res.json({ status: 'API online', versao: '1.0.0' });
 });
