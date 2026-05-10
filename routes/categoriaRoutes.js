@@ -1,6 +1,6 @@
 const expresss = require('express');
 const router = expresss.Router();
-const CategoriaController = require('../controllers/categoriaController');
+const categoriaController = require('../controllers/categoriaController');
 
 router.get('/categorias', CategoriaController.listarCategorias);
 router.post('/categorias', CategoriaController.criarCategoria);
