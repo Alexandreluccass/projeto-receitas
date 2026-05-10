@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const HabilidadeController = require('../controllers/habilidadeController');
+const habilidadeController = require('../controllers/habilidadeController');
 
-router.get('/habilidades', HabilidadeController.listarHabilidades);
-router.post('/habilidades', HabilidadeController.criarHabilidade);
-router.put('/habilidades/:id', HabilidadeController.atualizarHabilidade);
-router.delete('/habilidades/:id', HabilidadeController.excluirHabilidade);
+router.get('/habilidades', habilidadeController.listarHabilidades);
+router.post('/habilidades', habilidadeController.criarHabilidade);
+router.put('/habilidades/:id', habilidadeController.atualizarHabilidade);
+router.delete('/habilidades/:id', habilidadeController.excluirHabilidade);
 
 module.exports = router;
