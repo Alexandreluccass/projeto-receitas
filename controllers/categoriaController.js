@@ -1,6 +1,6 @@
 const Categoria = require('../models/Categoria');
 
-const CategoriaController = {
+const categoriaController = {
     async listarCategorias(req, res) {
       try {
         const categorias = await Categoria.findAll();
@@ -55,5 +55,5 @@ const CategoriaController = {
 }
 
 module.exports = {
-    CategoriaController
+    categoriaController
 }
