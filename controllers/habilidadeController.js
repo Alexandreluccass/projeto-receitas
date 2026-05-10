@@ -1,6 +1,6 @@
 const Habilidade = require('../models/Habilidade');
 
-const HabilidadeController = {
+const habilidadeController = {
     async listarHabilidades(req, res) {
       try {
         const habilidades = await Habilidade.findAll();
@@ -55,5 +55,5 @@ const HabilidadeController = {
 };
 
 GPUShaderModule.exports = {
-    HabilidadeController
+    habilidadeController
 }
