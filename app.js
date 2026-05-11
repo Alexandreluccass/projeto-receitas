@@ -19,6 +19,7 @@ app.use('/aluno/habilidades', require('./routes/alunoHabilidadeRoutes'));
 app.use('/relatorios', require('./routes/relatorioRoutes'));
 app.get('/', (req, res) => {
   res.json({ status: 'API online', versao: '1.0.0' });
+app.use('/alunos', require('./routes/alunoRoutes'));
 });
 
 app.use((err, req, res, next) => {

@@ -5,19 +5,12 @@ const receitaController = require('../controllers/receitaController');
 
 router.get('/', receitaController.listarPublico);
 router.get('/categoria/:id', receitaController.listarPorCategoria);
+router.get('/:id', receitaController.buscarPorId);
 
 router.use(autenticacao);
 
-router.post('/', (req, res) => {
-  res.json({ mensagem: `Receita criada pelo aluno ID ${req.aluno.id}` });
-});
-
-router.put('/:id', (req, res) => {
-  res.json({ mensagem: `Receita ${req.params.id} atualizada` });
-});
-
-router.delete('/:id', (req, res) => {
-  res.json({ mensagem: `Receita ${req.params.id} deletada` });
-});
+router.post('/', receitaController.criar);
+router.put('/:id', receitaController.atualizar);
+router.delete('/:id', receitaController.deletar);
 
 module.exports = router;
