@@ -7,6 +7,7 @@ const conectarMongoDB = require('./config/mongodb');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
 
 app.use('/auth',                          require('./routes/authRoutes'));
 app.use('/receitas',                      require('./routes/receitaRoutes'));
