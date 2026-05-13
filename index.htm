@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CookBook — Login</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #fdf8f0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+    .card { background: #fffdf9; border: 0.5px solid #e8dcc8; border-radius: 20px; padding: 3rem 2.5rem; width: 100%; max-width: 420px; }
+    .logo { text-align: center; margin-bottom: 2.5rem; }
+    .logo-icon { width: 56px; height: 56px; background: #c17f24; border-radius: 14px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+    .logo-icon i { font-size: 28px; color: #fff; }
+    .logo h1 { font-size: 26px; font-weight: 500; color: #3d2b1f; letter-spacing: -0.5px; }
+    .logo p { font-size: 14px; color: #8a7260; margin-top: 4px; }
+    .form-group { margin-bottom: 1.25rem; }
+    .form-group label { display: block; font-size: 13px; font-weight: 500; color: #5c4a3a; margin-bottom: 8px; }
+    .input-wrap { position: relative; display: flex; align-items: center; }
+    .input-wrap i { position: absolute; left: 14px; font-size: 18px; color: #b09070; pointer-events: none; }
+    .input-wrap input { width: 100%; height: 48px; padding: 0 16px 0 44px; background: #fdf5e8; border: 0.5px solid #dcc9a8; border-radius: 12px; font-size: 15px; color: #3d2b1f; outline: none; transition: border-color 0.2s; }
+    .input-wrap input:focus { border-color: #c17f24; background: #fff9ee; }
+    .input-wrap input::placeholder { color: #c4a882; }
+    .btn-login { width: 100%; height: 50px; background: #c17f24; border: none; border-radius: 12px; font-size: 16px; font-weight: 500; color: #fff; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s; }
+    .btn-login:hover { background: #a96d1c; }
+    .btn-login:disabled { opacity: 0.7; cursor: not-allowed; }
+    .error-msg { display: none; background: #fcebeb; border: 0.5px solid #f09595; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #791f1f; margin-bottom: 1rem; }
+    .success-msg { display: none; background: #eaf3de; border: 0.5px solid #97c459; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #27500a; margin-bottom: 1rem; }
+    .footer { text-align: center; margin-top: 2.5rem; font-size: 12px; color: #b09070; }
+    .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo">
+    <div class="logo-icon"><i class="ti ti-bowl"></i></div>
+    <h1>CookBook</h1>
+    <p>Entre para acessar suas receitas</p>
+  </div>
+
+  <div class="error-msg" id="errorMsg"></div>
+  <div class="success-msg" id="successMsg">Login realizado! Redirecionando...</div>
+
+  <div class="form-group">
+    <label>E-mail</label>
+    <div class="input-wrap">
+      <i class="ti ti-mail"></i>
+      <input type="email" id="email" placeholder="seu@email.com" autocomplete="email">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Senha</label>
+    <div class="input-wrap">
+      <i class="ti ti-lock"></i>
+      <input type="password" id="senha" placeholder="••••••••" autocomplete="current-password">
+    </div>
+  </div>
+
+  <button class="btn-login" id="btnLogin" onclick="fazerLogin()">Entrar</button>
+
+  <p class="footer">CookBook © 2025 — Receitas com carinho</p>
+</div>
+
+<script>
+const API = 'https://projeto-receitas-production.up.railway.app';
+
+async function fazerLogin() {
+  const email = document.getElementById('email').value.trim();
+  const senha = document.getElementById('senha').value;
+  const btn = document.getElementById('btnLogin');
+  const errorMsg = document.getElementById('errorMsg');
+  const successMsg = document.getElementById('successMsg');
+
+  errorMsg.style.display = 'none';
+  successMsg.style.display = 'none';
+
+  if (!email || !senha) {
+    errorMsg.textContent = 'Preencha e-mail e senha.';
+    errorMsg.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Entrando...';
+
+  try {
+    const res = await fetch(`${API}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, senha })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('aluno', JSON.stringify(data.aluno));
+      successMsg.style.display = 'block';
+      setTimeout(() => { window.location.href = 'receitas.html'; }, 1500);
+    } else {
+      errorMsg.textContent = data.erro || 'Credenciais inválidas.';
+      errorMsg.style.display = 'block';
+    }
+  } catch(e) {
+    errorMsg.textContent = 'Erro ao conectar com o servidor.';
+    errorMsg.style.display = 'block';
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = 'Entrar';
+}
+
+document.getElementById('senha').addEventListener('keydown', e => {
+  if (e.key === 'Enter') fazerLogin();
+});
+</script>
+</body>
+</html>
