@@ -107,14 +107,23 @@ async function carregarReceita() {
     }
 }
 
+// === FUNÇÃO CORRIGIDA ABAIXO ===
 async function carregarComentarios() {
     try {
-        const res = await fetch(`${API}/receitas/${receitaId}/comentarios`);
+        // Prepara o header com o token, caso ele exista
+        const config = {};
+        if (getToken()) {
+            config.headers = { 'Authorization': `Bearer ${getToken()}` };
+        }
+
+        // Faz o fetch passando a config
+        const res = await fetch(`${API}/receitas/${receitaId}/comentarios`, config);
         const coms = await res.json();
         const aluno = getAluno();
         const lista = document.getElementById('listaComentarios');
         
-        if (!coms.length) { 
+        // Verifica se veio um array válido ou vazio
+        if (!Array.isArray(coms) || !coms.length) { 
             lista.innerHTML='<div class="empty-com">Nenhum comentario ainda. Seja o primeiro!</div>'; 
             return; 
         }
@@ -130,8 +139,11 @@ async function carregarComentarios() {
             </div>
             <p class="com-texto">${c.texto}</p>
         </div>`).join('');
-    } catch(e) {}
+    } catch(e) {
+        console.error('Erro ao listar comentários:', e);
+    }
 }
+// ==================================
 
 async function enviarComentario() {
     const texto = document.getElementById('textoComentario').value.trim();
