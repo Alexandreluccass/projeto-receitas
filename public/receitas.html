@@ -6,6 +6,7 @@
 <title>CookBook Receitas</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <style>
+/* ... (estilos que você já tem) ... */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: system-ui, sans-serif; background: #fdf8f0; min-height: 100vh; }
 .navbar { background: #fffdf9; border-bottom: 0.5px solid #e8dcc8; padding: 0 2rem; height: 60px; display: flex; align-items: center; justify-content: space-between; }
@@ -55,8 +56,8 @@ body { font-family: system-ui, sans-serif; background: #fdf8f0; min-height: 100v
 .input-secao { font-weight: bold; margin-bottom: 10px !important; border: none !important; border-bottom: 2px solid #c17f24 !important; border-radius: 0 !important; background: transparent !important; padding-left: 0 !important; font-size: 15px !important;}
 .item-ingrediente { display: flex; gap: 8px; margin-bottom: 8px; }
 .item-ingrediente input { flex: 1; height: 38px !important; }
-.btn-del-sec { position: absolute; right: 12px; top: 12px; background: none; border: none; color: #e24b4a; cursor: pointer; font-weight: bold; }
-.btn-del-item { background: #ffebeb; border: 0.5px solid #e24b4a; color: #e24b4a; border-radius: 8px; width: 38px; cursor: pointer; display: flex; align-items: center; justify-content: center;}
+.btn-del-sec { position: absolute; right: 12px; top: 12px; background: none; border: none; color: #c17f24; cursor: pointer; font-weight: bold; }
+.btn-del-item { background: #ffebeb; border: 0.5px solid #c17f24; color: #c17f24; border-radius: 8px; width: 38px; cursor: pointer; display: flex; align-items: center; justify-content: center;}
 .btn-add-item { background: none; border: 1px dashed #c17f24; color: #c17f24; border-radius: 8px; width: 100%; padding: 8px; cursor: pointer; font-size: 13px; margin-top: 4px; }
 .btn-add-secao { background: #fdf5e8; border: 1px solid #c17f24; color: #c17f24; border-radius: 10px; width: 100%; padding: 10px; cursor: pointer; font-size: 14px; font-weight: 500; }
 </style>
@@ -72,17 +73,20 @@ body { font-family: system-ui, sans-serif; background: #fdf8f0; min-height: 100v
         <button class="btn-nova" onclick="abrirModal()">+ Nova receita</button>
     </div>
 </nav>
+
 <div class="hero">
-    <h1>Descubra receitas incriveis</h1>
+    <h1>Descubra receitas incríveis</h1>
     <p>Explore, compartilhe e saboreie momentos especiais</p>
     <div class="search-bar">
         <i class="ti ti-search"></i>
         <input type="text" id="busca" placeholder="Buscar receitas..." oninput="filtrarReceitas()">
     </div>
 </div>
+
 <div class="filtros" id="filtros">
     <button class="filtro ativo" onclick="filtrarCategoria(null, this)">Todas</button>
 </div>
+
 <div class="grid" id="grid"><div class="loading">Carregando...</div></div>
 
 <div class="modal-bg" id="modalBg">
@@ -131,28 +135,26 @@ async function carregarCategorias() {
         const res = await fetch(`${API}/categorias`);
         const cats = await res.json();
         
-        // 1. Carrega os botões de filtro no topo
+        // Renderiza filtros do topo
         const filtros = document.getElementById('filtros');
-        // 2. Carrega as checkboxes no Modal de Criar
+        // Renderiza checkboxes no modal
         const modalCats = document.getElementById('listaCategoriasModal');
         
         let modalHTML = '';
-
         cats.forEach(c => {
-            // Filtros do topo
+            // Botões de filtro
             const btn = document.createElement('button');
             btn.className = 'filtro'; 
             btn.textContent = c.nome;
             btn.onclick = () => { filtrarCategoria(c.id, btn); };
             filtros.appendChild(btn);
 
-            // Checkboxes do Modal
+            // Checkboxes do modal
             modalHTML += `
             <label style="display: flex; align-items: center; gap: 4px; font-size: 14px; color: #5c4a3a; cursor: pointer;">
                 <input type="checkbox" class="cat-checkbox" value="${c.id}" style="accent-color: #c17f24;"> ${c.nome}
             </label>`;
         });
-
         modalCats.innerHTML = modalHTML;
     } catch(e) {}
 }
@@ -204,6 +206,7 @@ function abrirModal() {
     if (!getToken()){ window.location.href='index.html'; return; }
     document.getElementById('modalBg').classList.add('open'); 
 }
+
 function fecharModal() { 
     document.getElementById('modalBg').classList.remove('open'); 
     document.getElementById('builderIngredientes').innerHTML = '';
@@ -246,10 +249,9 @@ async function criarReceita() {
     const link_externo = document.getElementById('linkReceita').value.trim();
     if(!nome) { alert('Informe o nome.'); return; }
 
-    // Pega as categorias marcadas
+    // PEGA AS CATEGORIAS MARCADAS
     const categoriasMarcadas = Array.from(document.querySelectorAll('.cat-checkbox:checked')).map(cb => parseInt(cb.value));
 
-    // Pega os ingredientes
     const ingredientesArray = [];
     document.querySelectorAll('.secao-ingrediente').forEach(sec => {
         const nomeSecao = sec.querySelector('.input-secao').value.trim() || 'Ingredientes';
@@ -265,16 +267,14 @@ async function criarReceita() {
         const res = await fetch(`${API}/receitas`, {
             method: 'POST', 
             headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}`},
-            // Manda as categorias pro Back-end!
             body: JSON.stringify({
                 nome, 
                 descricao, 
                 link_externo, 
                 ingredientes: ingredientesArray,
-                categorias: categoriasMarcadas 
+                categorias: categoriasMarcadas // ENVIA AS CATEGORIAS
             })
         });
-        
         if (res.ok) { 
             fecharModal(); 
             document.getElementById('nomeReceita').value = '';
