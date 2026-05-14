@@ -31,6 +31,15 @@ const Receita = sequelize.define('Receita', {
       isUrl: { msg: 'O link externo deve ser uma URL válida.' },
     },
   },
+
+  // O campo imagem_url deve ficar dentro deste bloco
+  imagem_url: {
+    type: DataTypes.STRING(500),
+    allowNull: true,
+    validate: {
+      isUrl: { msg: 'O link da imagem deve ser uma URL válida.' }
+    }
+  },
 },
 {
   tableName: 'receitas',

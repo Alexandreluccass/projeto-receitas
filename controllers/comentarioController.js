@@ -4,7 +4,9 @@ const comentarioController = {
 
   async listarPorReceita(req, res) {
     try {
-      const { receitaId } = req.params;
+      // CONVERSÃO NECESSÁRIA: O parâmetro vem como string, o Mongo espera Number
+      const receitaId = Number(req.params.receitaId);
+      
       const comentarios = await Comentario.find({ receitaId })
         .sort({ createdAt: -1 });
       res.json(comentarios);
@@ -15,7 +17,8 @@ const comentarioController = {
 
   async criar(req, res) {
     try {
-      const { receitaId } = req.params;
+      // CONVERSÃO NECESSÁRIA: Garantir que o ID da receita seja gravado como número
+      const receitaId = Number(req.params.receitaId);
       const { texto } = req.body;
 
       if (!texto) {
@@ -23,7 +26,7 @@ const comentarioController = {
       }
 
       const comentario = await Comentario.create({
-        receitaId,
+        receitaId, // Agora gravando como Number
         alunoId: req.aluno.id,
         nomeAluno: req.aluno.nome,
         texto,
@@ -31,6 +34,7 @@ const comentarioController = {
 
       res.status(201).json(comentario);
     } catch (error) {
+      console.error('Erro no Mongo:', error);
       res.status(400).json({ erro: error.message });
     }
   },
@@ -44,7 +48,9 @@ const comentarioController = {
         return res.status(404).json({ erro: 'Comentário não encontrado.' });
       }
 
-      if (comentario.alunoId !== req.aluno.id) {
+      // IMPORTANTE: Garantir que a comparação de IDs funcione
+      // req.aluno.id costuma ser Number, comentario.alunoId no Mongo pode vir como Number
+      if (Number(comentario.alunoId) !== Number(req.aluno.id)) {
         return res.status(403).json({ erro: 'Você só pode deletar seus próprios comentários.' });
       }
 
