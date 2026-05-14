@@ -41,8 +41,6 @@ O objetivo principal é proporcionar uma experiência simples, organizada e intu
 - PostgreSQL
 - MongoDB
 - Mongoose
-- JWT
-- Bcrypt
 
 ---
 
