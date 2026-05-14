@@ -99,8 +99,8 @@ async function carregarReceita() {
         
         if (ehResponsavel) document.getElementById('btnDel').style.display = 'block';
         
-        // Renderiza o cabeçalho E O CARD DE INGREDIENTES logo abaixo
-        document.getElementById('receitaConteudo').innerHTML = `
+        // 1. MONTA O CABEÇALHO DA RECEITA
+        let htmlBase = `
         <div class="receita-header" style="margin-bottom:1.5rem">
             <div class="receita-img"><i class="ti ti-soup"></i></div>
             <div class="receita-cats">${(r.categorias || []).map(c => `<span class="cat-tag">${c.nome}</span>`).join('') || '<span class="cat-tag">Sem categoria</span>'}</div>
@@ -110,42 +110,36 @@ async function carregarReceita() {
                 <span class="meta-item"><i class="ti ti-users"></i>${(r.alunos || []).map(a=>a.nome).join(', ') || 'Sem responsaveis'}</span>
             </div>
             ${r.link_externo ? `<a class="btn-link" href="${r.link_externo}" target="_blank"><i class="ti ti-external-link"></i>Ver receita completa</a>` : ''}
-        </div>
-        
-        <div class="ingredientes-card">
-            <div class="ingredientes-title">Ingredientes</div>
-            
-            <div class="ingrediente-secao">Massa</div>
-            <label class="ingrediente-item">
-                <input type="checkbox"> <span>1/2 xícara(s) de óleo</span>
-            </label>
-            <label class="ingrediente-item">
-                <input type="checkbox"> <span>3 unidade(s) ovo</span>
-            </label>
-            <label class="ingrediente-item">
-                <input type="checkbox"> <span>1 1/2 xícara(s) de leite</span>
-            </label>
-            <label class="ingrediente-item">
-                <input type="checkbox"> <span>2 xícara(s) de farinha de trigo</span>
-            </label>
-            <label class="ingrediente-item">
-                <input type="checkbox"> <span>2 xícara(s) de açúcar</span>
-            </label>
-            <label class="ingrediente-item">
-                <input type="checkbox"> <span>1 xícara(s) de chocolate em pó</span>
-            </label>
-            <label class="ingrediente-item">
-                <input type="checkbox"> <span>1 colher(es) de sopa de fermento</span>
-            </label>
-
-            <div class="ingrediente-secao">Cobertura</div>
-            <label class="ingrediente-item">
-                <input type="checkbox"> <span>1 caixinha(s) de creme de leite</span>
-            </label>
-            <label class="ingrediente-item">
-                <input type="checkbox"> <span>2 barra(s) de chocolate</span>
-            </label>
         </div>`;
+
+        // 2. MONTA A LISTA DE INGREDIENTES DINAMICAMENTE (SE EXISTIR NO BANCO)
+        if (r.ingredientes && Array.isArray(r.ingredientes) && r.ingredientes.length > 0) {
+            let listaHTML = '';
+            
+            // Roda cada seção (Ex: Massa, Cobertura)
+            r.ingredientes.forEach(sec => {
+                listaHTML += `<div class="ingrediente-secao">${sec.secao}</div>`;
+                
+                // Roda cada item dentro da seção
+                sec.itens.forEach(item => {
+                    listaHTML += `
+                    <label class="ingrediente-item">
+                        <input type="checkbox"> <span>${item}</span>
+                    </label>`;
+                });
+            });
+
+            // Acopla os ingredientes ao HTML final
+            htmlBase += `
+            <div class="ingredientes-card">
+                <div class="ingredientes-title">Ingredientes</div>
+                ${listaHTML}
+            </div>`;
+        }
+
+        // 3. JOGA TUDO NA TELA
+        document.getElementById('receitaConteudo').innerHTML = htmlBase;
+
     } catch(e) {
         document.getElementById('receitaConteudo').innerHTML = '<p style="color: #e24b4a; padding:1rem">Erro ao carregar receita.</p>';
     }
