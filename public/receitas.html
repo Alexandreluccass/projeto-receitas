@@ -40,7 +40,7 @@ body { font-family: system-ui, sans-serif; background: #fdf8f0; min-height: 100v
 .loading, .empty { text-align: center; padding: 3rem; color: #8a7260; }
 .modal-bg { display: none; position: fixed; inset: 0; background: rgba(61,43,31,0.5); z-index: 100; align-items: center; justify-content: center; padding: 1rem; }
 .modal-bg.open { display: flex; }
-.modal { background: #fffdf9; border-radius: 20px; padding: 2rem; width: 100%; max-width: 480px; }
+.modal { background: #fffdf9; border-radius: 20px; padding: 2rem; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
 .modal h2 { font-size: 20px; font-weight: 500; color: #3d2b1f; margin-bottom: 1.5rem; }
 .form-group { margin-bottom: 1rem; }
 .form-group label { display: block; font-size: 13px; font-weight: 500; color: #5c4a3a; margin-bottom: 6px; }
@@ -49,6 +49,16 @@ body { font-family: system-ui, sans-serif; background: #fdf8f0; min-height: 100v
 .modal-btns { display: flex; gap: 10px; margin-top: 1.5rem; }
 .btn-cancelar { flex: 1; height: 44px; background: none; border: 0.5px solid #dcc9a8; border-radius: 10px; font-size: 14px; color: #5c4a3a; cursor: pointer; }
 .btn-salvar { flex: 1; height: 44px; background: #c17f24; border: none; border-radius: 10px; font-size: 14px; color: #fff; cursor: pointer; }
+
+/* === ESTILOS DO CONSTRUTOR DE INGREDIENTES === */
+.secao-ingrediente { background: #fdf5e8; border: 0.5px solid #dcc9a8; border-radius: 10px; padding: 12px; margin-bottom: 10px; position: relative; }
+.input-secao { font-weight: bold; margin-bottom: 10px !important; border: none !important; border-bottom: 2px solid #c17f24 !important; border-radius: 0 !important; background: transparent !important; padding-left: 0 !important; font-size: 15px !important;}
+.item-ingrediente { display: flex; gap: 8px; margin-bottom: 8px; }
+.item-ingrediente input { flex: 1; height: 38px !important; }
+.btn-del-sec { position: absolute; right: 12px; top: 12px; background: none; border: none; color: #e24b4a; cursor: pointer; font-weight: bold; }
+.btn-del-item { background: #ffebeb; border: 0.5px solid #e24b4a; color: #e24b4a; border-radius: 8px; width: 38px; cursor: pointer; display: flex; align-items: center; justify-content: center;}
+.btn-add-item { background: none; border: 1px dashed #c17f24; color: #c17f24; border-radius: 8px; width: 100%; padding: 8px; cursor: pointer; font-size: 13px; margin-top: 4px; }
+.btn-add-secao { background: #fdf5e8; border: 1px solid #c17f24; color: #c17f24; border-radius: 10px; width: 100%; padding: 10px; cursor: pointer; font-size: 14px; font-weight: 500; }
 </style>
 </head>
 <body>
@@ -86,6 +96,13 @@ body { font-family: system-ui, sans-serif; background: #fdf8f0; min-height: 100v
             <label>Descricao</label>
             <textarea id="descReceita" placeholder="Descreva a receita..."></textarea>
         </div>
+        
+        <div class="form-group">
+            <label>Ingredientes</label>
+            <div id="builderIngredientes"></div>
+            <button type="button" class="btn-add-secao" onclick="adicionarSecao()">+ Adicionar Seção (Ex: Massa, Cobertura)</button>
+        </div>
+
         <div class="form-group">
             <label>Link externo (opcional)</label>
             <input type="url" id="linkReceita" placeholder="https://">
@@ -166,20 +183,72 @@ function abrirModal() {
 }
 function fecharModal() { 
     document.getElementById('modalBg').classList.remove('open'); 
+    document.getElementById('builderIngredientes').innerHTML = ''; // Limpa os ingredientes ao fechar
 }
+
+/* === LÓGICA DO CONSTRUTOR DE INGREDIENTES === */
+function adicionarSecao() {
+    const container = document.getElementById('builderIngredientes');
+    const secaoDiv = document.createElement('div');
+    secaoDiv.className = 'secao-ingrediente';
+    secaoDiv.innerHTML = `
+        <input type="text" class="input-secao" placeholder="Nome da Seção (Ex: Massa)">
+        <button type="button" class="btn-del-sec" onclick="this.parentElement.remove()" title="Excluir Seção">X</button>
+        <div class="itens-container">
+            <div class="item-ingrediente">
+                <input type="text" class="input-item" placeholder="Ex: 2 xícaras de açúcar">
+                <button type="button" class="btn-del-item" onclick="this.parentElement.remove()">X</button>
+            </div>
+        </div>
+        <button type="button" class="btn-add-item" onclick="adicionarItem(this)">+ Adicionar ingrediente</button>
+    `;
+    container.appendChild(secaoDiv);
+}
+
+function adicionarItem(btn) {
+    const container = btn.previousElementSibling;
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'item-ingrediente';
+    itemDiv.innerHTML = `
+        <input type="text" class="input-item" placeholder="Ex: 2 xícaras de açúcar">
+        <button type="button" class="btn-del-item" onclick="this.parentElement.remove()">X</button>
+    `;
+    container.appendChild(itemDiv);
+}
+/* =========================================== */
 
 async function criarReceita() {
     const nome = document.getElementById('nomeReceita').value.trim();
     const descricao = document.getElementById('descReceita').value.trim();
     const link_externo = document.getElementById('linkReceita').value.trim();
     if(!nome) { alert('Informe o nome.'); return; }
+
+    // Coleta todos os ingredientes digitados
+    const ingredientesArray = [];
+    document.querySelectorAll('.secao-ingrediente').forEach(sec => {
+        const nomeSecao = sec.querySelector('.input-secao').value.trim() || 'Ingredientes';
+        const itens = Array.from(sec.querySelectorAll('.input-item'))
+                           .map(input => input.value.trim())
+                           .filter(val => val !== ''); // Ignora campos vazios
+        if(itens.length > 0) {
+            ingredientesArray.push({ secao: nomeSecao, itens: itens });
+        }
+    });
+
     try {
         const res = await fetch(`${API}/receitas`, {
             method: 'POST', 
             headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}`},
-            body: JSON.stringify({nome, descricao, link_externo})
+            // Envia o array de ingredientes junto com o resto!
+            body: JSON.stringify({nome, descricao, link_externo, ingredientes: ingredientesArray})
         });
-        if (res.ok) { fecharModal(); carregarReceitas(); }
+        if (res.ok) { 
+            fecharModal(); 
+            document.getElementById('nomeReceita').value = '';
+            document.getElementById('descReceita').value = '';
+            document.getElementById('linkReceita').value = '';
+            carregarReceitas(); 
+        }
         else { const d = await res.json(); alert(d.erro || 'Erro.'); }
     } catch(e) { alert('Erro de conexao.'); }
 }

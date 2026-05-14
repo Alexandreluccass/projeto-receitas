@@ -32,7 +32,13 @@ const Receita = sequelize.define('Receita', {
     },
   },
 
-  // O campo imagem_url deve ficar dentro deste bloco
+  // === CAMPO NOVO PARA OS INGREDIENTES ===
+  ingredientes: {
+    type: DataTypes.JSON,
+    allowNull: true,
+  },
+  // =======================================
+
   imagem_url: {
     type: DataTypes.STRING(500),
     allowNull: true,

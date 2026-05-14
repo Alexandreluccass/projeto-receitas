@@ -65,9 +65,13 @@ const receitaController = {
 
   async criar(req, res) {
     try {
-      const { nome, descricao, link_externo, categorias = [], alunos = [] } = req.body;
+      // === AGORA PEGA OS INGREDIENTES ===
+      const { nome, descricao, link_externo, ingredientes, categorias = [], alunos = [] } = req.body;
       if (!nome) return res.status(400).json({ erro: 'O nome da receita é obrigatório.' });
-      const receita = await Receita.create({ nome, descricao, link_externo });
+      
+      // === SALVA OS INGREDIENTES AQUI ===
+      const receita = await Receita.create({ nome, descricao, link_externo, ingredientes });
+      
       const alunosIds = [...new Set([req.aluno.id, ...alunos])];
       await receita.setAlunos(alunosIds);
       if (categorias.length > 0) await receita.setCategorias(categorias);
@@ -86,10 +90,14 @@ const receitaController = {
   async atualizar(req, res) {
     try {
       const { id } = req.params;
-      const { nome, descricao, link_externo, categorias, alunos } = req.body;
+      // === AGORA PEGA OS INGREDIENTES AQUI TAMBÉM ===
+      const { nome, descricao, link_externo, ingredientes, categorias, alunos } = req.body;
       const receita = await Receita.findByPk(id);
       if (!receita) return res.status(404).json({ erro: 'Receita não encontrada' });
-      await receita.update({ nome, descricao, link_externo });
+      
+      // === ATUALIZA OS INGREDIENTES AQUI ===
+      await receita.update({ nome, descricao, link_externo, ingredientes });
+      
       if (categorias !== undefined) await receita.setCategorias(categorias);
       if (alunos !== undefined) {
         const alunosIds = [...new Set([req.aluno.id, ...alunos])];
