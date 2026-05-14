@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CookBook Receita</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, sans-serif; background: #fdf8f0; min-height: 100vh; }
+.navbar { background: #fffdf9; border-bottom: 0.5px solid #e8dcc8; padding: 0 2rem; height: 60px; display: flex; align-items: center; justify-content: space-between; }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo-icon { width: 34px; height: 34px; background: #c17f24; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.logo-icon i { font-size: 18px; color: #fff; }
+.logo-name { font-size: 18px; font-weight: 500; color: #3d2b1f; }
+.btn-voltar { background: none; border: 0.5px solid #dcc9a8; border-radius: 8px; padding: 6px 14px; font-size: 13px; color: #5c4a3a; cursor: pointer; }
+.container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+.receita-header { background: #fffdf9; border: 0.5px solid #e8dcc8; border-radius: 20px; padding: 2rem; margin-bottom: 1.5rem; }
+.receita-img { height: 200px; background: #f5ebe0; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; }
+.receita-img i { font-size: 64px; color: #dcc9a8; }
+.receita-cats { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.cat-tag { background: #fdf5e8; border: 0.5px solid #dcc9a8; border-radius: 20px; padding: 4px 12px; font-size: 12px; color: #c17f24; }
+.receita-titulo { font-size: 28px; font-weight: 500; color: #3d2b1f; margin-bottom: 12px; }
+.receita-desc { font-size: 15px; color: #5c4a3a; line-height: 1.7; margin-bottom: 16px; }
+.receita-meta { display: flex; gap: 16px; flex-wrap: wrap; }
+.meta-item { font-size: 13px; color: #8a7260; display: flex; align-items: center; gap: 6px; }
+.btn-link { display: inline-flex; align-items: center; gap: 6px; background: #c17f24; border: none; border-radius: 10px; padding: 10px 20px; font-size: 14px; color: #fff; cursor: pointer; text-decoration: none; margin-top: 16px; }
+.section-title { font-size: 18px; font-weight: 500; color: #3d2b1f; margin-bottom: 1rem; }
+.comentarios-box { background: #fffdf9; border: 0.5px solid #e8dcc8; border-radius: 20px; padding: 2rem; }
+.comentario { border-bottom: 0.5px solid #f0e6d3; padding: 1rem 0; }
+.comentario:last-child { border-bottom: none; }
+.com-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.com-nome { font-size: 13px; font-weight: 500; color: #3d2b1f; }
+.com-data { font-size: 12px; color: #b09070; }
+.com-texto { font-size: 14px; color: #5c4a3a; line-height: 1.5; }
+.btn-del-com { background: none; border: none; color: #e24b4a; cursor: pointer; font-size: 13px; }
+.form-comentario { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 0.5px solid #f0e6d3; }
+.form-comentario textarea { width: 100%; height: 80px; padding: 10px 14px; background: #fdf5e8; border: 0.5px solid #dcc9a8; border-radius: 10px; font-size: 14px; color: #3d2b1f; outline: none; resize: vertical; font-family: inherit; margin-bottom: 10px; }
+.form-comentario textarea:focus { border-color: #c17f24; }
+.btn-comentar { background: #c17f24; border: none; border-radius: 10px; padding: 10px 20px; font-size: 14px; color: #fff; cursor: pointer; }
+.empty-com { text-align: center; padding: 2rem; color: #609070; font-size: 14px; }
+.loading { text-align: center; padding: 2rem; color: #8a7260; }
+.btn-del-receita { background: none; border: 0.5px solid #e24b4a; border-radius: 8px; padding: 6px 14px; font-size: 13px; color: #e24b4a; cursor: pointer; }
+</style>
+</head>
+<body>
+<nav class="navbar">
+    <a class="logo" href="receitas.html">
+        <div class="logo-icon"><i class="ti ti-bowl"></i></div>
+        <span class="logo-name">CookBook</span>
+    </a>
+    <div style="display: flex; gap:8px">
+        <button class="btn-voltar" onclick="window.location.href='receitas.html'">
+            <i class="ti ti-arrow-left" style="font-size:14px;vertical-align:-2px;margin-right:4px"></i>Voltar
+        </button>
+        <button class="btn-del-receita" id="btnDel" style="display:none" onclick="deletarReceita()">Excluir</button>
+    </div>
+</nav>
+<div class="container">
+    <div id="receitaConteudo"><div class="loading">Carregando...</div></div>
+    <div class="comentarios-box" style="margin-top:0">
+        <p class="section-title">Comentarios</p>
+        <div id="listaComentarios"><div class="loading">Carregando comentarios...</div></div>
+        <div class="form-comentario" id="formComentario" style="display:none">
+            <textarea id="textoComentario" placeholder="Escreva um comentario..."></textarea>
+            <button class="btn-comentar" onclick="enviarComentario()">Comentar</button>
+        </div>
+        <p id="loginAviso" style="text-align:center; padding:1rem; font-size:13px;color: #b09070;display:none">
+            <a href="index.html" style="color: #c17f24">Faca login</a> para comentar.
+        </p>
+    </div>
+</div>
+
+<script>
+const API = 'https://projeto-receitas-production.up.railway.app';
+const params = new URLSearchParams(window.location.search);
+const receitaId = params.get('id');
+
+function getToken() { return localStorage.getItem('token'); }
+function getAluno() { const a = localStorage.getItem('aluno'); return a ? JSON.parse(a) : null; }
+function formatarData(d) { 
+    return new Date(d).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }); 
+}
+
+async function carregarReceita() {
+    try {
+        const res = await fetch(`${API}/receitas/${receitaId}`);
+        const r = await res.json();
+        const aluno = getAluno();
+        const ehResponsavel = aluno && r.alunos && r.alunos.some(a => a.id === aluno.id);
+        
+        if (ehResponsavel) document.getElementById('btnDel').style.display = 'block';
+        
+        document.getElementById('receitaConteudo').innerHTML = `
+        <div class="receita-header" style="margin-bottom:1.5rem">
+            <div class="receita-img"><i class="ti ti-soup"></i></div>
+            <div class="receita-cats">${(r.categorias || []).map(c => `<span class="cat-tag">${c.nome}</span>`).join('') || '<span class="cat-tag">Sem categoria</span>'}</div>
+            <h1 class="receita-titulo">${r.nome}</h1>
+            <p class="receita-desc">${r.descricao || 'Sem descricao.'}</p>
+            <div class="receita-meta">
+                <span class="meta-item"><i class="ti ti-users"></i>${(r.alunos || []).map(a=>a.nome).join(', ') || 'Sem responsaveis'}</span>
+            </div>
+            ${r.link_externo ? `<a class="btn-link" href="${r.link_externo}" target="_blank"><i class="ti ti-external-link"></i>Ver receita completa</a>` : ''}
+        </div>`;
+    } catch(e) {
+        document.getElementById('receitaConteudo').innerHTML = '<p style="color: #e24b4a; padding:1rem">Erro ao carregar receita.</p>';
+    }
+}
+
+async function carregarComentarios() {
+    try {
+        const res = await fetch(`${API}/receitas/${receitaId}/comentarios`);
+        const coms = await res.json();
+        const aluno = getAluno();
+        const lista = document.getElementById('listaComentarios');
+        
+        if (!coms.length) { 
+            lista.innerHTML='<div class="empty-com">Nenhum comentario ainda. Seja o primeiro!</div>'; 
+            return; 
+        }
+        
+        lista.innerHTML = coms.map(c => `
+        <div class="comentario">
+            <div class="com-header">
+                <span class="com-nome">${c.nomeAluno}</span>
+                <div style="display: flex;align-items:center; gap:8px">
+                    <span class="com-data">${formatarData(c.createdAt)}</span>
+                    ${aluno && aluno.id === c.alunoId ? `<button class="btn-del-com" onclick="deletarComentario('${c._id}')">Excluir</button>` : ''}
+                </div>
+            </div>
+            <p class="com-texto">${c.texto}</p>
+        </div>`).join('');
+    } catch(e) {}
+}
+
+async function enviarComentario() {
+    const texto = document.getElementById('textoComentario').value.trim();
+    if (!texto) { alert('Escreva um comentario.'); return; }
+    try {
+        const res = await fetch(`${API}/receitas/${receitaId}/comentarios`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+            body: JSON.stringify({ texto })
+        });
+        if (res.ok) { document.getElementById('textoComentario').value = ''; }
+        else { const d = await res.json(); alert(d.erro || 'Erro.'); }
+    } catch(e) { alert('Erro de conexao.'); }
+    carregarComentarios(); 
+}
+
+async function deletarComentario(id) {
+    if (!confirm('Excluir comentario?')) return;
+    try {
+        await fetch(`${API}/receitas/${receitaId}/comentarios/${id}`, {
+            method: 'DELETE', headers: { 'Authorization': `Bearer ${getToken()}` }
+        });
+        carregarComentarios();
+    } catch(e) {}
+}
+
+async function deletarReceita() {
+    if (!confirm('Excluir esta receita?')) return;
+    try {
+        const res = await fetch(`${API}/receitas/${receitaId}`, {
+            method: 'DELETE', headers: { 'Authorization': `Bearer ${getToken()}` }
+        });
+        if (res.ok) window.location.href = 'receitas.html';
+    } catch(e) {}
+}
+
+if (getToken()) {
+    document.getElementById('formComentario').style.display = 'block';
+} else {
+    document.getElementById('loginAviso').style.display = 'block';
+}
+
+if (!receitaId) { 
+    window.location.href = 'receitas.html'; 
+} else { 
+    carregarReceita(); 
+    carregarComentarios(); 
+}
+</script>
+</body>
+</html>

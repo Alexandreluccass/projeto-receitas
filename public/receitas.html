@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CookBook Receitas</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, sans-serif; background: #fdf8f0; min-height: 100vh; }
+.navbar { background: #fffdf9; border-bottom: 0.5px solid #e8dcc8; padding: 0 2rem; height: 60px; display: flex; align-items: center; justify-content: space-between; }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo-icon { width: 34px; height: 34px; background: #c17f24; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.logo-icon i { font-size: 18px; color: #fff; }
+.logo-name { font-size: 18px; font-weight: 500; color: #3d2b1f; }
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.btn-perfil { background: none; border: 0.5px solid #dcc9a8; border-radius: 8px; padding: 6px 14px; font-size: 13px; color: #5c4a3a; cursor: pointer; }
+.btn-nova { background: #c17f24; border: none; border-radius: 8px; padding: 6px 14px; font-size: 13px; color: #fff; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+.hero { text-align: center; padding: 3rem 2rem 2rem; }
+.hero h1 { font-size: 32px; font-weight: 500; color: #3d2b1f; margin-bottom: 8px; }
+.hero p { font-size: 16px; color: #8a7260; }
+.search-bar { max-width: 500px; margin: 1.5rem auto 0; position: relative; }
+.search-bar i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 18px; color: #609070; }
+.search-bar input { width: 100%; height: 46px; padding: 0 16px 0 44px; background: #fffdf9; border: 0.5px solid #dcc9a8; border-radius: 12px; font-size: 15px; color: #3d2b1f; outline: none; }
+.filtros { display: flex; gap: 8px; justify-content: center; padding: 1rem 2rem; flex-wrap: wrap; }
+.filtro { background: #fffdf9; border: 0.5px solid #dcc9a8; border-radius: 20px; padding: 6px 16px; font-size: 13px; color: #5c4a3a; cursor: pointer; }
+.filtro.ativo { background: #c17f24; border-color: #c17f24; color: #fff; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; padding: 1rem 2rem 3rem; max-width: 1200px; margin: 0 auto; }
+.card { background: #fffdf9; border: 0.5px solid #e8dcc8; border-radius: 16px; overflow: hidden; cursor: pointer; transition: border-color 0.2s; }
+.card:hover { border-color: #c17f24; }
+.card-img { height: 160px; background: #f5ebe0; display: flex; align-items: center; justify-content: center; }
+.card-img i { font-size: 48px; color: #dcc9a8; }
+.card-body { padding: 1rem; }
+.card-cat { font-size: 11px; font-weight: 500; color: #c17f24; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.card-title { font-size: 16px; font-weight: 500; color: #3d2b1f; margin-bottom: 6px; }
+.card-desc { font-size: 13px; color: #8a7260; line-height: 1.5; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card-footer { display: flex; align-items: center; justify-content: space-between; }
+.card-autor { font-size: 12px; color: #609070; }
+.btn-ver { background: #c17f24; border: none; border-radius: 8px; padding: 6px 12px; font-size: 12px; color: #fff; cursor: pointer; }
+.loading, .empty { text-align: center; padding: 3rem; color: #8a7260; }
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(61,43,31,0.5); z-index: 100; align-items: center; justify-content: center; padding: 1rem; }
+.modal-bg.open { display: flex; }
+.modal { background: #fffdf9; border-radius: 20px; padding: 2rem; width: 100%; max-width: 480px; }
+.modal h2 { font-size: 20px; font-weight: 500; color: #3d2b1f; margin-bottom: 1.5rem; }
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; font-size: 13px; font-weight: 500; color: #5c4a3a; margin-bottom: 6px; }
+.form-group input, .form-group textarea { width: 100%; padding: 10px 14px; background: #fdf5e8; border: 0.5px solid #dcc9a8; border-radius: 10px; font-size: 14px; color: #3d2b1f; outline: none; font-family: inherit; }
+.form-group textarea { height: 80px; resize: vertical; }
+.modal-btns { display: flex; gap: 10px; margin-top: 1.5rem; }
+.btn-cancelar { flex: 1; height: 44px; background: none; border: 0.5px solid #dcc9a8; border-radius: 10px; font-size: 14px; color: #5c4a3a; cursor: pointer; }
+.btn-salvar { flex: 1; height: 44px; background: #c17f24; border: none; border-radius: 10px; font-size: 14px; color: #fff; cursor: pointer; }
+</style>
+</head>
+<body>
+<nav class="navbar">
+    <a class="logo" href="receitas.html">
+        <div class="logo-icon"><i class="ti ti-bowl"></i></div>
+        <span class="logo-name">CookBook</span>
+    </a>
+    <div class="nav-right">
+        <button class="btn-perfil" onclick="window.location.href='perfil.html'">Perfil</button>
+        <button class="btn-nova" onclick="abrirModal()">+ Nova receita</button>
+    </div>
+</nav>
+<div class="hero">
+    <h1>Descubra receitas incriveis</h1>
+    <p>Explore, compartilhe e saboreie momentos especiais</p>
+    <div class="search-bar">
+        <i class="ti ti-search"></i>
+        <input type="text" id="busca" placeholder="Buscar receitas..." oninput="filtrarReceitas()">
+    </div>
+</div>
+<div class="filtros" id="filtros">
+    <button class="filtro ativo" onclick="filtrarCategoria(null, this)">Todas</button>
+</div>
+<div class="grid" id="grid"><div class="loading">Carregando...</div></div>
+
+<div class="modal-bg" id="modalBg">
+    <div class="modal">
+        <h2>Nova receita</h2>
+        <div class="form-group">
+            <label>Nome</label>
+            <input type="text" id="nomeReceita" placeholder="Ex: Bolo de chocolate">
+        </div>
+        <div class="form-group">
+            <label>Descricao</label>
+            <textarea id="descReceita" placeholder="Descreva a receita..."></textarea>
+        </div>
+        <div class="form-group">
+            <label>Link externo (opcional)</label>
+            <input type="url" id="linkReceita" placeholder="https://">
+        </div>
+        <div class="modal-btns">
+            <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+            <button class="btn-salvar" onclick="criarReceita()">Salvar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const API = 'https://projeto-receitas-production.up.railway.app';
+let todasReceitas = [], categoriaAtiva = null;
+function getToken() { return localStorage.getItem('token'); }
+
+async function carregarCategorias() {
+    try {
+        const res = await fetch(`${API}/categorias`);
+        const cats = await res.json();
+        const filtros = document.getElementById('filtros');
+        cats.forEach(c => {
+            const btn = document.createElement('button');
+            btn.className = 'filtro'; 
+            btn.textContent = c.nome;
+            btn.onclick = () => { filtrarCategoria(c.id, btn); };
+            filtros.appendChild(btn);
+        });
+    } catch(e) {}
+}
+
+async function carregarReceitas() {
+    try {
+        const res = await fetch(`${API}/receitas`);
+        todasReceitas = await res.json();
+        renderizar(todasReceitas);
+    } catch(e) {
+        document.getElementById('grid').innerHTML='<div class="empty">Erro ao carregar.</div>';
+    }
+}
+
+function renderizar(receitas) {
+    const grid = document.getElementById('grid');
+    if (!receitas.length) { grid.innerHTML='<div class="empty">Nenhuma receita.</div>'; return; }
+    grid.innerHTML = receitas.map(r => `
+    <div class="card" onclick="window.location.href='receita.html?id=${r.id}'">
+        <div class="card-img"><i class="ti ti-soup"></i></div>
+        <div class="card-body">
+            <div class="card-cat">${r.categorias && r.categorias.length ? r.categorias.map(c=>c.nome).join(', ') : 'Sem categoria'}</div>
+            <div class="card-title">${r.nome}</div>
+            <div class="card-desc">${r.descricao || 'Sem descricao'}</div>
+            <div class="card-footer">
+                <span class="card-autor">${r.alunos && r.alunos.length ? r.alunos.map(a=>a.nome).join(', ') : ''}</span>
+                <button class="btn-ver">Ver mais</button>
+            </div>
+        </div>
+    </div>`).join('');
+}
+
+function filtrarCategoria(id, btn) {
+    categoriaAtiva = id;
+    document.querySelectorAll('.filtro').forEach(b => b.classList.remove('ativo'));
+    btn.classList.add('ativo');
+    filtrarReceitas();
+}
+
+function filtrarReceitas() {
+    const busca = document.getElementById('busca').value.toLowerCase();
+    renderizar(todasReceitas.filter(r => 
+        (!categoriaAtiva || (r.categorias && r.categorias.some(c=>c.id===categoriaAtiva))) && 
+        (!busca || r.nome.toLowerCase().includes(busca))
+    ));
+}
+
+function abrirModal() { 
+    if (!getToken()){ window.location.href='index.html'; return; }
+    document.getElementById('modalBg').classList.add('open'); 
+}
+function fecharModal() { 
+    document.getElementById('modalBg').classList.remove('open'); 
+}
+
+async function criarReceita() {
+    const nome = document.getElementById('nomeReceita').value.trim();
+    const descricao = document.getElementById('descReceita').value.trim();
+    const link_externo = document.getElementById('linkReceita').value.trim();
+    if(!nome) { alert('Informe o nome.'); return; }
+    try {
+        const res = await fetch(`${API}/receitas`, {
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}`},
+            body: JSON.stringify({nome, descricao, link_externo})
+        });
+        if (res.ok) { fecharModal(); carregarReceitas(); }
+        else { const d = await res.json(); alert(d.erro || 'Erro.'); }
+    } catch(e) { alert('Erro de conexao.'); }
+}
+
+carregarCategorias(); 
+carregarReceitas();
+</script>
+</body>
+</html>
