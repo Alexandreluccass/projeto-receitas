@@ -36,12 +36,12 @@ const iniciarServidor = async () => {
 
     await conectarMongoDB();
 
-    const syncOpcoes = process.env.NODE_ENV === 'development'
-      ? { alter: true }
-      : {};
+    // === MUDANÇA AQUI ===
+    // Forçamos o alter: true independente de ser development ou production
+    const syncOpcoes = { alter: true }; 
 
     await sequelize.sync(syncOpcoes);
-    console.log('✅ Tabelas sincronizadas.');
+    console.log('✅ Tabelas sincronizadas e atualizadas no banco.');
 
     app.listen(PORT, () => {
       console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
