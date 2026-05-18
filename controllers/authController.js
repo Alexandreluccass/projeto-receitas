@@ -35,10 +35,11 @@ const login = async (req, res) => {
 
     // 4. Gera o token JWT
     const payload = {
-      id: aluno.id,
-      nome: aluno.nome,
-      email: aluno.email,
-    };
+  id: aluno.id,
+  nome: aluno.nome,
+  email: aluno.email,
+  isAdmin: aluno.is_admin,
+};
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRES_IN || '8h',

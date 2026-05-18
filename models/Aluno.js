@@ -37,13 +37,18 @@ const Aluno = sequelize.define('Aluno', {
       notEmpty: { msg: 'A senha não pode ser vazia.' },
     },
   },
+
+  is_admin: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
 },
 {
   tableName: 'alunos',
   timestamps: true,
   underscored: true,
 
-  // Hook: faz o hash da senha antes de criar OU atualizar o aluno
   hooks: {
     beforeCreate: async (aluno) => {
       if (aluno.senha) {
@@ -52,7 +57,6 @@ const Aluno = sequelize.define('Aluno', {
       }
     },
     beforeUpdate: async (aluno) => {
-      // Só rehasha se o campo senha foi modificado na requisição
       if (aluno.changed('senha')) {
         const SALT_ROUNDS = 12;
         aluno.senha = await bcrypt.hash(aluno.senha, SALT_ROUNDS);
@@ -61,10 +65,6 @@ const Aluno = sequelize.define('Aluno', {
   },
 });
 
-/**
- * Método de instância: compara uma senha em texto plano com o hash salvo.
- * Uso: const valido = await aluno.verificarSenha(senhaDigitada);
- */
 Aluno.prototype.verificarSenha = async function (senhaTextoPlano) {
   return bcrypt.compare(senhaTextoPlano, this.senha);
 };

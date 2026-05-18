@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router({ mergeParams: true });
-const autenticacao = require('../middlewares/autenticacao');
+const { autenticacao } = require('../middlewares/autenticacao');
 const comentarioController = require('../controllers/comentarioController');
 
 router.get('/', comentarioController.listarPorReceita);

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const autenticacao = require('../middlewares/autenticacao');
+const { autenticacao } = require('../middlewares/autenticacao');
 const receitaController = require('../controllers/receitaController');
 
 router.get('/', receitaController.listarPublico);
