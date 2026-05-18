@@ -1,22 +1,24 @@
 require('dotenv').config();
 
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const { sequelize } = require('./models');
 const conectarMongoDB = require('./config/mongodb');
 
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-app.use('/auth',                          require('./routes/authRoutes'));
-app.use('/receitas',                      require('./routes/receitaRoutes'));
+app.use('/auth',                            require('./routes/authRoutes'));
+app.use('/receitas',                        require('./routes/receitaRoutes'));
 app.use('/receitas/:receitaId/comentarios', require('./routes/comentarioRoutes'));
-app.use('/categorias',                    require('./routes/categoriaRoutes'));
-app.use('/habilidades',                   require('./routes/habilidadeRoutes'));
-app.use('/alunos',                        require('./routes/alunoRoutes'));
-app.use('/aluno/habilidades',             require('./routes/alunoHabilidadeRoutes'));
-app.use('/relatorios',                    require('./routes/relatorioRoutes'));
+app.use('/categorias',                      require('./routes/categoriaRoutes'));
+app.use('/habilidades',                     require('./routes/habilidadeRoutes'));
+app.use('/alunos',                          require('./routes/alunoRoutes'));
+app.use('/aluno/habilidades',               require('./routes/alunoHabilidadeRoutes'));
+app.use('/relatorios',                      require('./routes/relatorioRoutes'));
 
 app.get('/', (req, res) => {
   res.json({ status: 'API online', versao: '1.0.0' });
@@ -36,11 +38,7 @@ const iniciarServidor = async () => {
 
     await conectarMongoDB();
 
-    // === MUDANÇA AQUI ===
-    // Forçamos o alter: true independente de ser development ou production
-    const syncOpcoes = { alter: true }; 
-
-    await sequelize.sync(syncOpcoes);
+    await sequelize.sync({ alter: true });
     console.log('✅ Tabelas sincronizadas e atualizadas no banco.');
 
     app.listen(PORT, () => {
