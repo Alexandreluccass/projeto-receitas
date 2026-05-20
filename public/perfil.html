@@ -20,7 +20,8 @@ body { font-family: system-ui, sans-serif; background: #fdf8f0; min-height: 100v
 .perfil-info h2 { font-size: 22px; font-weight: 500; color: #3d2b1f; margin-bottom: 4px; }
 .perfil-info p { font-size: 14px; color: #8a7260; }
 .section { background: #fffdf9; border: 0.5px solid #e8dcc8; border-radius: 20px; padding: 1.5rem; margin-bottom: 1.5rem; }
-.section-title { font-size: 16px; font-weight: 500; color: #3d2b1f; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+.section-title { font-size: 16px; font-weight: 500; color: #3d2b1f; display: flex; align-items: center; gap: 8px; }
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
 .habilidade-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 0.5px solid #f0e6d3; }
 .habilidade-item:last-child { border-bottom: none; }
 .hab-nome { font-size: 14px; color: #3d2b1f; }
@@ -33,196 +34,119 @@ body { font-family: system-ui, sans-serif; background: #fdf8f0; min-height: 100v
 .receita-item:hover .rec-nome { color: #c17f24; }
 .rec-nome { font-size: 14px; color: #3d2b1f; transition: color 0.2s; }
 .rec-cats { font-size: 12px; color: #b09070; margin-top: 2px; }
-.empty { text-align: center; padding: 1.5rem; color: #609070; font-size: 14px; }
+.empty { text-align: center; padding: 1.5rem; color: #b09070; font-size: 14px; }
 .loading { text-align: center; padding: 2rem; color: #8a7260; }
-.section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-}
-
-.btn-add {
-    background: #c17f24;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 12px;
-    cursor: pointer;
-    font-size: 13px;
-    display: flex;
-    align-items: center;
-    gap: 5px; }
-.btn-add:hover { opacity: 0.9; }
+.btn-add { background: #c17f24; color: white; border: none; border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 5px; }
 </style>
 </head>
 <body>
 <nav class="navbar">
-    <a class="logo" href="receitas.html">
-        <div class="logo-icon"><i class="ti ti-bowl"></i></div>
-        <span class="logo-name">CookBook</span>
-    </a>
-    <button class="btn-sair" onclick="sair()">
-        <i class="ti ti-logout" style="font-size:14px;vertical-align:-2px;margin-right:4px"></i>Sair
-    </button>
+  <a class="logo" href="receitas.html">
+    <div class="logo-icon"><i class="ti ti-bowl"></i></div>
+    <span class="logo-name">CookBook</span>
+  </a>
+  <button class="btn-sair" onclick="sair()">
+    <i class="ti ti-logout" style="font-size:14px;vertical-align:-2px;margin-right:4px"></i>Sair
+  </button>
 </nav>
 <div class="container">
-    <div id="perfilConteudo"><div class="loading">Carregando perfil...</div></div>
+  <div id="perfilConteudo"><div class="loading">Carregando perfil...</div></div>
 </div>
 
 <script>
 const API = 'http://localhost:3000';
 function getToken() { return localStorage.getItem('token'); }
-
-function sair() { 
-    localStorage.removeItem('token'); 
-    localStorage.removeItem('aluno');
-    window.location.href = 'index.html'; 
-}
-
-function adicionarHabilidade() {
-    const nome = prompt('Digite o nome da habilidade:');
-    if (!nome) return;
-
-    const nivel = prompt('Digite o nível da habilidade (1-10):');
-    if (!nivel) return;
-
-    fetch(`${API}/habilidades`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${getToken()}`
-        },
-        body: JSON.stringify({
-            nome,
-            nivel
-        })
-    })
-    .then(res => {
-        if (!res.ok) throw new Error();
-        return res.json();
-    })
-    .then(() => {
-        carregarPerfil();
-    })
-    .catch(() => {
-        alert('Erro ao adicionar habilidade');
-    });
-}
+function sair() { localStorage.removeItem('token'); localStorage.removeItem('aluno'); window.location.href = 'index.html'; }
 
 async function carregarPerfil() {
-    if (!getToken()) { window.location.href = 'index.html'; return; }
-    try {
-        const res = await fetch(`${API}/alunos/perfil`, {
-            headers: { 'Authorization': `Bearer ${getToken()}` }
-        });
-        if (!res.ok) { sair(); return; }
-        
-        const aluno = await res.json();
-        const iniciais = aluno.nome.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
-        
-        document.getElementById('perfilConteudo').innerHTML = `
-        <div class="perfil-card">
-            <div class="avatar">${iniciais}</div>
-            <div class="perfil-info">
-                <h2>${aluno.nome}</h2>
-                <p>${aluno.email}</p>
-            </div>
+  if (!getToken()) { window.location.href = 'index.html'; return; }
+  try {
+    const res = await fetch(`${API}/alunos/perfil`, { headers: { 'Authorization': `Bearer ${getToken()}` } });
+    if (!res.ok) { sair(); return; }
+    const aluno = await res.json();
+    const iniciais = aluno.nome.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+
+    document.getElementById('perfilConteudo').innerHTML = `
+      <div class="perfil-card">
+        <div class="avatar">${iniciais}</div>
+        <div class="perfil-info">
+          <h2>${aluno.nome}</h2>
+          <p>${aluno.email}</p>
         </div>
-        
+      </div>
+
+      <div class="section">
         <div class="section-header">
-    <p class="section-title">
-        <i class="ti ti-star"></i>
-        Habilidades
-    </p>
-
-    <button class="btn-add" onclick="adicionarHabilidade()">
-        <i class="ti ti-plus"></i>
-        Adicionar
-    </button>
-</div>
-            ${aluno.habilidades && aluno.habilidades.length ? aluno.habilidades.map(h => `
-            <div class="habilidade-item">
-                <span class="hab-nome">${h.nome}</span>
-                <div class="nivel-bar">
-                    <div class="bar"><div class="bar-fill" style="width:${h.AlunoHabilidade.nivel * 10}%"></div></div>
-                    <span class="nivel-num">${h.AlunoHabilidade.nivel}/10</span>
-                </div>
-            </div>`).join('') : '<div class="empty">Nenhuma habilidade cadastrada.</div>'}
+          <p class="section-title"><i class="ti ti-star"></i> Habilidades</p>
+          <button class="btn-add" onclick="adicionarHabilidade()"><i class="ti ti-plus"></i> Adicionar</button>
         </div>
-        
-        <div class="section">
-            <p class="section-title"><i class="ti ti-book"></i> Minhas Receitas</p>
-            ${aluno.receitas && aluno.receitas.length ? aluno.receitas.map(r => `
+        ${aluno.habilidades && aluno.habilidades.length
+          ? aluno.habilidades.map(h => `
+            <div class="habilidade-item">
+              <span class="hab-nome">${h.nome}</span>
+              <div class="nivel-bar">
+                <div class="bar"><div class="bar-fill" style="width:${h.AlunoHabilidade.nivel*10}%"></div></div>
+                <span class="nivel-num">${h.AlunoHabilidade.nivel}/10</span>
+              </div>
+            </div>`).join('')
+          : '<div class="empty">Nenhuma habilidade cadastrada.</div>'}
+      </div>
+
+      <div class="section">
+        <p class="section-title" style="margin-bottom:1rem"><i class="ti ti-book"></i> Minhas Receitas</p>
+        ${aluno.receitas && aluno.receitas.length
+          ? aluno.receitas.map(r => `
             <div class="receita-item" onclick="window.location.href='receita.html?id=${r.id}'">
-                <div>
-                    <p class="rec-nome">${r.nome}</p>
-                    <p class="rec-cats">${r.categorias && r.categorias.length ? r.categorias.map(c=>c.nome).join(', ') : 'Sem categoria'}</p>
-                </div>
-                <i class="ti ti-chevron-right" style="color: #609070;font-size:16px"></i>
-            </div>`).join('') : '<div class="empty">Nenhuma receita criada ainda.</div>'}
-        </div>`;
-    } catch(e) {
-        document.getElementById('perfilConteudo').innerHTML = '<p style="color: #e24b4a; padding: 1rem">Erro ao carregar perfil.</p>';
-    }
+              <div>
+                <p class="rec-nome">${r.nome}</p>
+                <p class="rec-cats">${r.categorias && r.categorias.length ? r.categorias.map(c=>c.nome).join(', ') : 'Sem categoria'}</p>
+              </div>
+              <i class="ti ti-chevron-right" style="color:#b09070;font-size:16px"></i>
+            </div>`).join('')
+          : '<div class="empty">Nenhuma receita criada ainda.</div>'}
+      </div>`;
+  } catch(e) {
+    document.getElementById('perfilConteudo').innerHTML = '<p style="color:#e24b4a;padding:1rem">Erro ao carregar perfil.</p>';
+  }
 }
+
 async function adicionarHabilidade() {
-    try {
-        const nome = prompt('Nome da habilidade:');
-        if (!nome) return;
+  try {
+    const nome = prompt('Nome da habilidade:');
+    if (!nome) return;
+    const nivel = prompt('Nível da habilidade (0-10):');
+    if (nivel === null) return;
 
-        const nivel = prompt('Nível da habilidade (0-10):');
-        if (!nivel) return;
+    const listaRes = await fetch(`${API}/habilidades`, { headers: { 'Authorization': `Bearer ${getToken()}` } });
+    const habilidades = await listaRes.json();
+    let habilidade = habilidades.find(h => h.nome.toLowerCase() === nome.toLowerCase());
 
-        const listaRes = await fetch(`${API}/habilidades`, {
-            headers: {
-                'Authorization': `Bearer ${getToken()}`
-            }
-        });
+    if (!habilidade) {
+      const criarRes = await fetch(`${API}/habilidades`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+        body: JSON.stringify({ nome })
+      });
+      if (!criarRes.ok) throw new Error('Erro ao criar habilidade');
+      habilidade = await criarRes.json();
+    }
 
-        const habilidades = await listaRes.json();
+    const vinculoRes = await fetch(`${API}/aluno/habilidades`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+      body: JSON.stringify({ habilidade_id: habilidade.id, nivel: parseInt(nivel) })
+    });
 
-        let habilidade = habilidades.find(h =>
-            h.nome.toLowerCase() === nome.toLowerCase()
-        );
-        
-        if (!habilidade) {
-            const criarRes = await fetch(`${API}/habilidades`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${getToken()}`
-                },
-                body: JSON.stringify({ nome })
-            });
+    const dados = await vinculoRes.json();
+    if (!vinculoRes.ok) throw new Error(dados.erro || 'Erro ao vincular habilidade');
 
-            if (!criarRes.ok) {
-                throw new Error('Erro ao criar habilidade');
-            }
-
-            habilidade = await criarRes.json();
-        }
-
-        const vinculoRes = await fetch(`${API}/aluno-habilidades`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${getToken()}`
-            },
-            body: JSON.stringify({
-                habilidade_id: habilidade.id,
-                nivel
-            })
-        });
-
-        const dados = await vinculoRes.json();
-
-        if (!vinculoRes.ok) {
-            throw new Error(dados.erro || 'Erro ao vincular habilidade');
-        }
-
-        carregarPerfil();
+    carregarPerfil();
+  } catch(e) {
+    alert(e.message || 'Erro ao adicionar habilidade.');
+  }
 }
+
+carregarPerfil();
 </script>
 </body>
 </html>
