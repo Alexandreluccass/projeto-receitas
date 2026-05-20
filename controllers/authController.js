@@ -50,10 +50,11 @@ const login = async (req, res) => {
       mensagem: 'Login realizado com sucesso.',
       token,
       aluno: {
-        id: aluno.id,
-        nome: aluno.nome,
-        email: aluno.email,
-      },
+            id: aluno.id,
+            nome: aluno.nome,
+            email: aluno.email,
+            isAdmin: aluno.is_admin,
+                                    },
     });
 
   } catch (error) {

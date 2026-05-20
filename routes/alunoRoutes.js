@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { autenticacao, apenasAdmin } = require('../middlewares/autenticacao');
+const { autenticacao, apenasAdmin } = require('../middlewares/autenticacao');   
 const alunoController = require('../controllers/alunoController');
 
 router.use(autenticacao);

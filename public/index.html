@@ -80,15 +80,18 @@ async function fazerLogin() {
             body: JSON.stringify({ email, senha })
         });
         const data = await res.json();
-        if (res.ok) {
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('aluno', JSON.stringify(data.aluno));
-            successMsg.style.display = 'block';
-            setTimeout(() => { window.location.href = 'receitas.html'; }, 1500);
+    if (res.ok) {
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('aluno', JSON.stringify(data.aluno));
+    successMsg.style.display = 'block';
+    setTimeout(() => {
+        if (data.aluno.isAdmin) {
+            window.location.href = 'admin.html';
         } else {
-            errorMsg.textContent = data.erro || 'Credenciais invalidas.';
-            errorMsg.style.display = 'block';
+            window.location.href = 'receitas.html';
         }
+    }, 1500);
+}
     } catch(e) {
         errorMsg.textContent = 'Erro ao conectar com o servidor.';
         errorMsg.style.display = 'block';

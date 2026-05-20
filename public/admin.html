@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CookBook — Admin</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, sans-serif; background: #fdf8f0; min-height: 100vh; }
+.navbar { background: #fffdf9; border-bottom: 0.5px solid #e8dcc8; padding: 0 2rem; height: 60px; display: flex; align-items: center; justify-content: space-between; }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo-icon { width: 34px; height: 34px; background: #c17f24; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.logo-icon i { font-size: 18px; color: #fff; }
+.logo-name { font-size: 18px; font-weight: 500; color: #3d2b1f; }
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.btn-sair { background: none; border: 0.5px solid #e24b4a; border-radius: 8px; padding: 6px 14px; font-size: 13px; color: #e24b4a; cursor: pointer; }
+.btn-site { background: none; border: 0.5px solid #dcc9a8; border-radius: 8px; padding: 6px 14px; font-size: 13px; color: #5c4a3a; cursor: pointer; }
+.container { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+.page-title { font-size: 24px; font-weight: 500; color: #3d2b1f; margin-bottom: 2rem; }
+.tabs { display: flex; gap: 8px; margin-bottom: 2rem; flex-wrap: wrap; }
+.tab { background: #fffdf9; border: 0.5px solid #dcc9a8; border-radius: 10px; padding: 8px 20px; font-size: 14px; color: #5c4a3a; cursor: pointer; }
+.tab.ativo { background: #c17f24; border-color: #c17f24; color: #fff; }
+.panel { display: none; }
+.panel.ativo { display: block; }
+.card-section { background: #fffdf9; border: 0.5px solid #e8dcc8; border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; }
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+.section-header h2 { font-size: 16px; font-weight: 500; color: #3d2b1f; }
+.btn-novo { background: #c17f24; border: none; border-radius: 8px; padding: 8px 16px; font-size: 13px; color: #fff; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; font-size: 12px; font-weight: 500; color: #8a7260; padding: 8px 12px; border-bottom: 0.5px solid #e8dcc8; text-transform: uppercase; letter-spacing: 0.5px; }
+td { padding: 12px; font-size: 14px; color: #3d2b1f; border-bottom: 0.5px solid #f0e6d3; }
+tr:last-child td { border-bottom: none; }
+.badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+.badge-admin { background: #fdf5e8; color: #c17f24; border: 0.5px solid #dcc9a8; }
+.badge-aluno { background: #f0f7ee; color: #4a8c3f; border: 0.5px solid #b5d4b2; }
+.btn-del { background: none; border: 0.5px solid #e24b4a; border-radius: 6px; padding: 4px 10px; font-size: 12px; color: #e24b4a; cursor: pointer; }
+.loading { text-align: center; padding: 2rem; color: #8a7260; }
+.empty { text-align: center; padding: 2rem; color: #b09070; font-size: 14px; }
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(61,43,31,0.5); z-index: 100; align-items: center; justify-content: center; padding: 1rem; }
+.modal-bg.open { display: flex; }
+.modal { background: #fffdf9; border-radius: 20px; padding: 2rem; width: 100%; max-width: 440px; }
+.modal h2 { font-size: 18px; font-weight: 500; color: #3d2b1f; margin-bottom: 1.5rem; }
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; font-size: 13px; font-weight: 500; color: #5c4a3a; margin-bottom: 6px; }
+.form-group input, .form-group select { width: 100%; padding: 10px 14px; background: #fdf5e8; border: 0.5px solid #dcc9a8; border-radius: 10px; font-size: 14px; color: #3d2b1f; outline: none; font-family: inherit; }
+.form-group input:focus { border-color: #c17f24; }
+.modal-btns { display: flex; gap: 10px; margin-top: 1.5rem; }
+.btn-cancelar { flex: 1; height: 44px; background: none; border: 0.5px solid #dcc9a8; border-radius: 10px; font-size: 14px; color: #5c4a3a; cursor: pointer; }
+.btn-salvar { flex: 1; height: 44px; background: #c17f24; border: none; border-radius: 10px; font-size: 14px; color: #fff; cursor: pointer; }
+.acesso-negado { text-align: center; padding: 4rem 2rem; }
+.acesso-negado i { font-size: 64px; color: #dcc9a8; display: block; margin-bottom: 1rem; }
+.acesso-negado h2 { font-size: 22px; color: #3d2b1f; margin-bottom: 8px; }
+.acesso-negado p { color: #8a7260; }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a class="logo" href="receitas.html">
+    <div class="logo-icon"><i class="ti ti-bowl"></i></div>
+    <span class="logo-name">CookBook Admin</span>
+  </a>
+  <div class="nav-right">
+    <button class="btn-site" onclick="window.location.href='receitas.html'">Ver site</button>
+    <button class="btn-sair" onclick="sair()">Sair</button>
+  </div>
+</nav>
+
+<div class="container" id="conteudo">
+  <div class="loading">Verificando acesso...</div>
+</div>
+
+<!-- Modal Novo Aluno -->
+<div class="modal-bg" id="modalAluno">
+  <div class="modal">
+    <h2>Novo Aluno</h2>
+    <div class="form-group"><label>Nome</label><input type="text" id="nomeAluno" placeholder="Nome completo"></div>
+    <div class="form-group"><label>E-mail</label><input type="email" id="emailAluno" placeholder="email@exemplo.com"></div>
+    <div class="form-group"><label>Senha</label><input type="password" id="senhaAluno" placeholder="Senha inicial"></div>
+    <div class="form-group">
+      <label>Tipo</label>
+      <select id="tipoAluno">
+        <option value="false">Aluno</option>
+        <option value="true">Administrador</option>
+      </select>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancelar" onclick="fecharModal('modalAluno')">Cancelar</button>
+      <button class="btn-salvar" onclick="criarAluno()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nova Categoria -->
+<div class="modal-bg" id="modalCategoria">
+  <div class="modal">
+    <h2>Nova Categoria</h2>
+    <div class="form-group"><label>Nome</label><input type="text" id="nomeCategoria" placeholder="Ex: Sobremesas"></div>
+    <div class="modal-btns">
+      <button class="btn-cancelar" onclick="fecharModal('modalCategoria')">Cancelar</button>
+      <button class="btn-salvar" onclick="criarCategoria()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nova Habilidade -->
+<div class="modal-bg" id="modalHabilidade">
+  <div class="modal">
+    <h2>Nova Habilidade</h2>
+    <div class="form-group"><label>Nome</label><input type="text" id="nomeHabilidade" placeholder="Ex: Confeitaria"></div>
+    <div class="modal-btns">
+      <button class="btn-cancelar" onclick="fecharModal('modalHabilidade')">Cancelar</button>
+      <button class="btn-salvar" onclick="criarHabilidade()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:3000';
+function getToken() { return localStorage.getItem('token'); }
+function getAluno() { const a = localStorage.getItem('aluno'); return a ? JSON.parse(a) : null; }
+function sair() { localStorage.removeItem('token'); localStorage.removeItem('aluno'); window.location.href = 'index.html'; }
+function abrirModal(id) { document.getElementById(id).classList.add('open'); }
+function fecharModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function trocarTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('ativo'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('ativo'));
+  document.getElementById('tab-' + tab).classList.add('ativo');
+  document.getElementById('panel-' + tab).classList.add('ativo');
+}
+
+async function init() {
+  const aluno = getAluno();
+  if (!aluno || !getToken()) { window.location.href = 'index.html'; return; }
+
+  // Verifica se é admin
+  try {
+    const res = await fetch(`${API}/alunos/perfil`, {
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    });
+    const perfil = await res.json();
+    if (!perfil.is_admin) {
+      document.getElementById('conteudo').innerHTML = `
+        <div class="acesso-negado">
+          <i class="ti ti-lock"></i>
+          <h2>Acesso Negado</h2>
+          <p>Você não tem permissão para acessar esta página.</p>
+        </div>`;
+      return;
+    }
+  } catch(e) { window.location.href = 'index.html'; return; }
+
+  document.getElementById('conteudo').innerHTML = `
+    <p class="page-title">Painel de Administração</p>
+    <div class="tabs">
+      <button class="tab ativo" id="tab-alunos" onclick="trocarTab('alunos')"><i class="ti ti-users" style="margin-right:6px"></i>Alunos</button>
+      <button class="tab" id="tab-receitas" onclick="trocarTab('receitas')"><i class="ti ti-soup" style="margin-right:6px"></i>Receitas</button>
+      <button class="tab" id="tab-categorias" onclick="trocarTab('categorias')"><i class="ti ti-tag" style="margin-right:6px"></i>Categorias</button>
+      <button class="tab" id="tab-habilidades" onclick="trocarTab('habilidades')"><i class="ti ti-star" style="margin-right:6px"></i>Habilidades</button>
+    </div>
+    <div class="panel ativo" id="panel-alunos"><div class="loading">Carregando...</div></div>
+    <div class="panel" id="panel-receitas"><div class="loading">Carregando...</div></div>
+    <div class="panel" id="panel-categorias"><div class="loading">Carregando...</div></div>
+    <div class="panel" id="panel-habilidades"><div class="loading">Carregando...</div></div>`;
+
+  carregarAlunos();
+  carregarReceitas();
+  carregarCategorias();
+  carregarHabilidades();
+}
+
+async function carregarAlunos() {
+  try {
+    const res = await fetch(`${API}/alunos`, { headers: { 'Authorization': `Bearer ${getToken()}` } });
+    const alunos = await res.json();
+    document.getElementById('panel-alunos').innerHTML = `
+      <div class="card-section">
+        <div class="section-header">
+          <h2>Alunos (${alunos.length})</h2>
+          <button class="btn-novo" onclick="abrirModal('modalAluno')"><i class="ti ti-plus"></i>Novo Aluno</button>
+        </div>
+        ${alunos.length ? `
+        <table>
+          <thead><tr><th>Nome</th><th>E-mail</th><th>Tipo</th><th>Ação</th></tr></thead>
+          <tbody>${alunos.map(a => `
+            <tr>
+              <td>${a.nome}</td>
+              <td>${a.email}</td>
+              <td><span class="badge ${a.is_admin ? 'badge-admin' : 'badge-aluno'}">${a.is_admin ? 'Admin' : 'Aluno'}</span></td>
+              <td><button class="btn-del" onclick="deletarAluno(${a.id}, '${a.nome}')">Excluir</button></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>` : '<div class="empty">Nenhum aluno cadastrado.</div>'}
+      </div>`;
+  } catch(e) { document.getElementById('panel-alunos').innerHTML = '<div class="empty">Erro ao carregar.</div>'; }
+}
+
+async function carregarReceitas() {
+  try {
+    const res = await fetch(`${API}/receitas`);
+    const receitas = await res.json();
+    document.getElementById('panel-receitas').innerHTML = `
+      <div class="card-section">
+        <div class="section-header"><h2>Receitas (${receitas.length})</h2></div>
+        ${receitas.length ? `
+        <table>
+          <thead><tr><th>Nome</th><th>Categorias</th><th>Responsáveis</th><th>Ação</th></tr></thead>
+          <tbody>${receitas.map(r => `
+            <tr>
+              <td>${r.nome}</td>
+              <td>${r.categorias && r.categorias.length ? r.categorias.map(c=>c.nome).join(', ') : '—'}</td>
+              <td>${r.alunos && r.alunos.length ? r.alunos.map(a=>a.nome).join(', ') : '—'}</td>
+              <td><button class="btn-del" onclick="deletarReceita(${r.id}, '${r.nome}')">Excluir</button></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>` : '<div class="empty">Nenhuma receita cadastrada.</div>'}
+      </div>`;
+  } catch(e) { document.getElementById('panel-receitas').innerHTML = '<div class="empty">Erro ao carregar.</div>'; }
+}
+
+async function carregarCategorias() {
+  try {
+    const res = await fetch(`${API}/categorias`);
+    const cats = await res.json();
+    document.getElementById('panel-categorias').innerHTML = `
+      <div class="card-section">
+        <div class="section-header">
+          <h2>Categorias (${cats.length})</h2>
+          <button class="btn-novo" onclick="abrirModal('modalCategoria')"><i class="ti ti-plus"></i>Nova Categoria</button>
+        </div>
+        ${cats.length ? `
+        <table>
+          <thead><tr><th>Nome</th><th>Ação</th></tr></thead>
+          <tbody>${cats.map(c => `
+            <tr>
+              <td>${c.nome}</td>
+              <td><button class="btn-del" onclick="deletarCategoria(${c.id}, '${c.nome}')">Excluir</button></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>` : '<div class="empty">Nenhuma categoria cadastrada.</div>'}
+      </div>`;
+  } catch(e) { document.getElementById('panel-categorias').innerHTML = '<div class="empty">Erro ao carregar.</div>'; }
+}
+
+async function carregarHabilidades() {
+  try {
+    const res = await fetch(`${API}/habilidades`);
+    const habs = await res.json();
+    document.getElementById('panel-habilidades').innerHTML = `
+      <div class="card-section">
+        <div class="section-header">
+          <h2>Habilidades (${habs.length})</h2>
+          <button class="btn-novo" onclick="abrirModal('modalHabilidade')"><i class="ti ti-plus"></i>Nova Habilidade</button>
+        </div>
+        ${habs.length ? `
+        <table>
+          <thead><tr><th>Nome</th><th>Ação</th></tr></thead>
+          <tbody>${habs.map(h => `
+            <tr>
+              <td>${h.nome}</td>
+              <td><button class="btn-del" onclick="deletarHabilidade(${h.id}, '${h.nome}')">Excluir</button></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>` : '<div class="empty">Nenhuma habilidade cadastrada.</div>'}
+      </div>`;
+  } catch(e) { document.getElementById('panel-habilidades').innerHTML = '<div class="empty">Erro ao carregar.</div>'; }
+}
+
+async function criarAluno() {
+  const nome = document.getElementById('nomeAluno').value.trim();
+  const email = document.getElementById('emailAluno').value.trim();
+  const senha = document.getElementById('senhaAluno').value;
+  const is_admin = document.getElementById('tipoAluno').value === 'true';
+  if (!nome || !email || !senha) { alert('Preencha todos os campos.'); return; }
+  try {
+    const res = await fetch(`${API}/alunos`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+      body: JSON.stringify({ nome, email, senha, is_admin })
+    });
+    if (res.ok) { fecharModal('modalAluno'); carregarAlunos(); document.getElementById('nomeAluno').value=''; document.getElementById('emailAluno').value=''; document.getElementById('senhaAluno').value=''; }
+    else { const d = await res.json(); alert(d.erro || 'Erro.'); }
+  } catch(e) { alert('Erro de conexão.'); }
+}
+
+async function criarCategoria() {
+  const nome = document.getElementById('nomeCategoria').value.trim();
+  if (!nome) { alert('Informe o nome.'); return; }
+  try {
+    const res = await fetch(`${API}/categorias`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+      body: JSON.stringify({ nome })
+    });
+    if (res.ok) { fecharModal('modalCategoria'); carregarCategorias(); document.getElementById('nomeCategoria').value=''; }
+    else { const d = await res.json(); alert(d.erro || 'Erro.'); }
+  } catch(e) { alert('Erro de conexão.'); }
+}
+
+async function criarHabilidade() {
+  const nome = document.getElementById('nomeHabilidade').value.trim();
+  if (!nome) { alert('Informe o nome.'); return; }
+  try {
+    const res = await fetch(`${API}/habilidades`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+      body: JSON.stringify({ nome })
+    });
+    if (res.ok) { fecharModal('modalHabilidade'); carregarHabilidades(); document.getElementById('nomeHabilidade').value=''; }
+    else { const d = await res.json(); alert(d.erro || 'Erro.'); }
+  } catch(e) { alert('Erro de conexão.'); }
+}
+
+async function deletarAluno(id, nome) {
+  if (!confirm(`Excluir aluno "${nome}"?`)) return;
+  try {
+    const res = await fetch(`${API}/alunos/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${getToken()}` } });
+    if (res.ok) carregarAlunos();
+    else { const d = await res.json(); alert(d.erro || 'Erro.'); }
+  } catch(e) { alert('Erro de conexão.'); }
+}
+
+async function deletarReceita(id, nome) {
+  if (!confirm(`Excluir receita "${nome}"?`)) return;
+  try {
+    const res = await fetch(`${API}/receitas/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${getToken()}` } });
+    if (res.ok) carregarReceitas();
+    else { const d = await res.json(); alert(d.erro || 'Erro.'); }
+  } catch(e) { alert('Erro de conexão.'); }
+}
+
+async function deletarCategoria(id, nome) {
+  if (!confirm(`Excluir categoria "${nome}"?`)) return;
+  try {
+    const res = await fetch(`${API}/categorias/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${getToken()}` } });
+    if (res.ok) carregarCategorias();
+    else { const d = await res.json(); alert(d.erro || 'Erro.'); }
+  } catch(e) { alert('Erro de conexão.'); }
+}
+
+async function deletarHabilidade(id, nome) {
+  if (!confirm(`Excluir habilidade "${nome}"?`)) return;
+  try {
+    const res = await fetch(`${API}/habilidades/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${getToken()}` } });
+    if (res.ok) carregarHabilidades();
+    else { const d = await res.json(); alert(d.erro || 'Erro.'); }
+  } catch(e) { alert('Erro de conexão.'); }
+}
+
+init();
+</script>
+</body>
+</html>
