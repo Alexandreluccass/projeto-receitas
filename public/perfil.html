@@ -35,9 +35,25 @@ body { font-family: system-ui, sans-serif; background: #fdf8f0; min-height: 100v
 .rec-cats { font-size: 12px; color: #b09070; margin-top: 2px; }
 .empty { text-align: center; padding: 1.5rem; color: #609070; font-size: 14px; }
 .loading { text-align: center; padding: 2rem; color: #8a7260; }
-.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
-.btn-add { background: #c17f24; color: white; border: none; border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 5px; transition: 0.2s; }
-.btn-add:hover { background: #a96d1d; }
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.btn-add {
+    background: #c17f24;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 5px; }
+.btn-add:hover { opacity: 0.9; }
 </style>
 </head>
 <body>
@@ -114,17 +130,17 @@ async function carregarPerfil() {
             </div>
         </div>
         
-        <div class="section">
-            <div class="section-header">
-                <p class="section-title">
-                    <i class="ti ti-star"></i> Habilidades
-                </p>
+        <div class="section-header">
+    <p class="section-title">
+        <i class="ti ti-star"></i>
+        Habilidades
+    </p>
 
-                <button class="btn-add" onclick="adicionarHabilidade()">
-                    <i class="ti ti-plus"></i>
-                    Adicionar
-                </button>
-            </div>
+    <button class="btn-add" onclick="adicionarHabilidade()">
+        <i class="ti ti-plus"></i>
+        Adicionar
+    </button>
+</div>
             ${aluno.habilidades && aluno.habilidades.length ? aluno.habilidades.map(h => `
             <div class="habilidade-item">
                 <span class="hab-nome">${h.nome}</span>
@@ -150,8 +166,71 @@ async function carregarPerfil() {
         document.getElementById('perfilConteudo').innerHTML = '<p style="color: #e24b4a; padding: 1rem">Erro ao carregar perfil.</p>';
     }
 }
+async function adicionarHabilidade() {
+    try {
+        const nome = prompt('Nome da habilidade:');
+        if (!nome) return;
 
-carregarPerfil();
+        const nivel = prompt('Nível da habilidade (0-100):');
+        if (!nivel) return;
+
+        // procura habilidade existente
+        const listaRes = await fetch(`${API}/habilidades`, {
+            headers: {
+                'Authorization': `Bearer ${getToken()}`
+            }
+        });
+
+        const habilidades = await listaRes.json();
+
+        let habilidade = habilidades.find(h =>
+            h.nome.toLowerCase() === nome.toLowerCase()
+        );
+
+        // se não existir, cria
+        if (!habilidade) {
+            const criarRes = await fetch(`${API}/habilidades`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${getToken()}`
+                },
+                body: JSON.stringify({ nome })
+            });
+
+            if (!criarRes.ok) {
+                throw new Error('Erro ao criar habilidade');
+            }
+
+            habilidade = await criarRes.json();
+        }
+
+        // agora vincula ao aluno
+        const vinculoRes = await fetch(`${API}/aluno-habilidades`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getToken()}`
+            },
+            body: JSON.stringify({
+                habilidade_id: habilidade.id,
+                nivel
+            })
+        });
+
+        const dados = await vinculoRes.json();
+
+        if (!vinculoRes.ok) {
+            throw new Error(dados.erro || 'Erro ao vincular habilidade');
+        }
+
+        carregarPerfil();
+
+    } catch (error) {
+        alert(error.message);
+        console.error(error);
+    }
+}
 </script>
 </body>
 </html>
