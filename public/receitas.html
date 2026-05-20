@@ -126,10 +126,27 @@ body { font-family: system-ui, sans-serif; background: #fdf8f0; min-height: 100v
 </div>
 
 <script>
+
 const API = 'http://localhost:3000';
 let todasReceitas = [], categoriaAtiva = null;
 function getToken() { return localStorage.getItem('token'); }
 
+function verificarAdmin() {
+    const aluno = localStorage.getItem('aluno');
+    if (aluno) {
+        const dados = JSON.parse(aluno);
+        if (dados.isAdmin) {
+            const navRight = document.getElementById('navRight');
+            const btnAdmin = document.createElement('button');
+            btnAdmin.className = 'btn-perfil';
+            btnAdmin.textContent = '⚙ Admin';
+            btnAdmin.onclick = () => window.location.href = 'admin.html';
+            navRight.insertBefore(btnAdmin, navRight.firstChild);
+        }
+    }
+}
+
+verificarAdmin();
 async function carregarCategorias() {
     try {
         const res = await fetch(`${API}/categorias`);
